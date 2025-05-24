@@ -5,20 +5,20 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="streamlit-product-card",
-    version="0.1.0",
+    version="0.1.2",
     author="msr2903",
     author_email="michaelpersonal67@gmail.com",
     description="An e-commerce product card component for Streamlit",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="your_github_fork_url",
+    url="https://github.com/msr2903/st-productcard",
     packages=setuptools.find_packages(where="."),
     include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Framework :: Streamlit",
+        # "Framework :: Streamlit",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     python_requires=">=3.8",

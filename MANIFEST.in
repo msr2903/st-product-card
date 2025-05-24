@@ -1,1 +1,1 @@
-recursive-include streamlit_card/frontend/build *
+recursive-include streamlit_product_card/frontend/build *
