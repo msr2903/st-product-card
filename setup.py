@@ -1,32 +1,26 @@
-# -*- coding: utf-8 -*-
 import setuptools
 
-with open("README.md") as readme_file:
-    readme = readme_file.read()
-
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
 setuptools.setup(
-    name="streamlit-card",
-    version="1.0.2",
-    author="gamcoh",
-    author_email="cohengamliel8@gmail.com",
-    description="A streamlit component, to make UI cards",
-    long_description=readme,
+    name="streamlit-product-card",
+    version="0.1.0",
+    author="msr2903",
+    author_email="michaelpersonal67@gmail.com",
+    description="An e-commerce product card component for Streamlit",
+    long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/gamcoh/st-card",
-    packages=setuptools.find_packages(),
+    url="your_github_fork_url",
+    packages=setuptools.find_packages(where="."),
     include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent",
         "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Framework :: Streamlit",
+        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    keywords="card streamlit streamlit-component",
     python_requires=">=3.8",
-    install_requires=[
-        # By definition, a Custom Component depends on Streamlit.
-        # If your component has other Python dependencies, list
-        # them here.
-        "streamlit >= 0.63",
-    ],
+    install_requires=["streamlit>=1.0"],
 )
