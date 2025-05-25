@@ -4,11 +4,16 @@ A flexible and customizable Streamlit component designed to display product-like
 
 ## Features
 
-* **Flexible Content:** Display name, description (single string or list), price, image, and an optional button.
-* **Advanced Image Control:** Customize image position, aspect ratio ("native", "1/1", "16/9", etc.), object fit, and width percentage in horizontal layouts.
-* **Responsive Design:** Configure mobile behavior for horizontal cards (stack top/bottom, shrink, or none) below a 600px breakpoint.
-* **Customization & Styling:** Enable animations, load custom fonts via URL, and apply detailed CSS overrides using the `styles` prop (expects kebab-case CSS properties).
-* **Interactivity:** Handle click events on the button (if present) or the entire card (if no button) via an `on_button_click` callback.
+* **Flexible Content:**
+  Display name, description (single string or list), price, image, and an optional button.
+* **Advanced Image Control:**
+  Customize image position, aspect ratio ("native", "1/1", "16/9", etc.), object fit, and width percentage in horizontal layouts.
+* **Responsive Design:**
+  Configure mobile behavior for horizontal cards (stack top/bottom, shrink, or none) below a 600px breakpoint.
+* **Customization & Styling:**
+  Enable animations, load custom fonts via URL, and apply detailed CSS overrides using the `styles` prop (expects kebab-case CSS properties).
+* **Interactivity:**
+  Handle click events on the button (if present) or the entire card (if no button) via an `on_button_click` callback.
 
 ## Installation
 
