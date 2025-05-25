@@ -5,29 +5,39 @@ import {
 } from "streamlit-component-lib";
 import React, { ReactNode } from "react";
 import styled from "@emotion/styled";
+import { Global, css } from '@emotion/react'; 
+import * as CSS from 'csstype'; 
 
 type PicturePosition = "top" | "bottom" | "left" | "right";
+type MobileBreakpointBehavior = "stack top" | "stack bottom" | "shrink" | "none";
+type EmotionCompatibleStyle = { [key: string]: any };
+
+
+interface ProductCardArgs {
+  productName: string;
+  description?: string[];
+  price?: string;
+  productImage?: string;
+  buttonText: string; 
+  picturePosition: PicturePosition;
+  enableAnimation: boolean;
+  imageWidthPercent: number;
+  imageAspectRatio: string; 
+  imageObjectFit: CSS.Property.ObjectFit; 
+  mobileBreakpointBehavior: MobileBreakpointBehavior;
+  fontUrl?: string;
+  styles: { 
+    card?: EmotionCompatibleStyle; 
+    title?: EmotionCompatibleStyle;
+    text?: EmotionCompatibleStyle;
+    price?: EmotionCompatibleStyle;
+    button?: EmotionCompatibleStyle;
+    image?: EmotionCompatibleStyle; 
+  };
+}
 
 interface ProductCardProps {
-  args: {
-    productName: string;
-    description?: string[];
-    price?: string;
-    productImage?: string;
-    buttonText?: string;
-    useButton: boolean;
-    picturePosition: PicturePosition;
-    picturePaddings: boolean;
-    enableAnimation: boolean;
-    styles: {
-      card?: React.CSSProperties;
-      title?: React.CSSProperties;
-      text?: React.CSSProperties;
-      price?: React.CSSProperties;
-      button?: React.CSSProperties;
-      image?: React.CSSProperties;
-    };
-  };
+  args: ProductCardArgs;
   theme?: {
     font?: string;
     secondaryBackgroundColor?: string;
@@ -35,6 +45,18 @@ interface ProductCardProps {
     primaryColor?: string;
   };
 }
+
+const globalStyles = css`
+  body {
+    margin: 0; 
+    padding: 10px; 
+    box-sizing: border-box;
+  }
+  #root { 
+    width: 100%;
+    height: 100%;
+  }
+`;
 
 class ProductCardComponent extends StreamlitComponentBase<ProductCardProps> {
   componentDidMount(): void {
@@ -46,15 +68,21 @@ class ProductCardComponent extends StreamlitComponentBase<ProductCardProps> {
     Streamlit.setFrameHeight();
   }
 
+  private sendClickEvent = (): void => {
+    Streamlit.setComponentValue({ clickEventId: Date.now() });
+  }
+
   private onCardClick = (): void => {
-    Streamlit.setComponentValue({ buttonClicked: true });
+    if (!this.props.args.buttonText || this.props.args.buttonText.trim() === "") {
+        this.sendClickEvent();
+    }
   };
 
   private onButtonClick = (
     e: React.MouseEvent<HTMLButtonElement>
   ): void => {
-    e.stopPropagation();
-    Streamlit.setComponentValue({ buttonClicked: true });
+    e.stopPropagation(); 
+    this.sendClickEvent();
   };
 
   render(): ReactNode {
@@ -72,157 +100,363 @@ class ProductCardComponent extends StreamlitComponentBase<ProductCardProps> {
       description = [],
       price,
       productImage,
-      buttonText = "Add to Cart",
-      useButton,
+      buttonText, 
       picturePosition,
-      picturePaddings,
       enableAnimation,
-      styles,
+      styles, 
+      fontUrl,
+      imageWidthPercent,
+      imageAspectRatio,
+      imageObjectFit,
+      mobileBreakpointBehavior,
     } = args;
 
-    const isHorizontal =
-      picturePosition === "left" || picturePosition === "right";
-    const flexDirection = isHorizontal ? "row" : "column";
+    const userCardStyles = styles.card || {};
+    const userImageStyles = styles.image || {};
+    const userTextStyles = styles.text || {};
+    const userTitleStyles = styles.title || {};
+    const userPriceStyles = styles.price || {};
+    const userButtonStyles = styles.button || {};
 
-    // 1) Compute the card's borderRadius (string)
+    const isHorizontalLayout =
+      picturePosition === "left" || picturePosition === "right";
+    
+    const showButton = buttonText && buttonText.trim() !== "";
+
     const defaultRadius = 12;
-    // no optional chaining—fall back safely
-    const rawBorder = styles.card && styles.card.borderRadius;
-    const slotRadius =
-      typeof rawBorder === "string" || typeof rawBorder === "number"
-        ? rawBorder
-        : undefined;
+    const rawBorderRadius = userCardStyles['border-radius'] || userCardStyles.borderRadius; 
     const cardRadius =
-      typeof slotRadius === "string"
-        ? slotRadius
-        : typeof slotRadius === "number"
-        ? `${slotRadius}px`
+      typeof rawBorderRadius === "string"
+        ? rawBorderRadius
+        : typeof rawBorderRadius === "number"
+        ? `${rawBorderRadius}px`
         : `${defaultRadius}px`;
 
-    // 2) Card container
-    const Card = styled.div({
-      display: "flex",
-      flexDirection,
-      fontFamily: `${theme.font}, sans-serif`,
-      backgroundColor: theme.secondaryBackgroundColor,
-      borderRadius: cardRadius,
-      boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
-      overflow: "hidden",
-      maxWidth: isHorizontal ? 500 : 320,
-      margin: "auto",
-      position: "relative",
-      cursor: useButton ? "default" : "pointer",
-      ...(enableAnimation && {
-        transform: "scale(0.95)",
-        transition: "transform 0.2s ease-in-out",
-        "&:hover": { transform: "scale(1)" },
-        "&:active": { transform: "scale(0.95)" },
-      }),
-      ...styles.card,
-    });
-
-    // 3) Image styling with matching radius when padded
-    const Image = styled.img({
-      width: isHorizontal ? 180 : "100%",
-      height: isHorizontal ? "auto" : 180,
-      objectFit: "cover",
-      borderRadius: picturePaddings
-        ? cardRadius
-        : isHorizontal
-        ? picturePosition === "left"
-          ? `${cardRadius} 0 0 ${cardRadius}`
-          : `0 ${cardRadius} ${cardRadius} 0`
-        : picturePosition === "top"
-        ? `${cardRadius} ${cardRadius} 0 0`
-        : `0 0 ${cardRadius} ${cardRadius}`,
-      marginLeft:
-        isHorizontal && picturePosition === "right" ? 12 : 0,
-      marginRight:
-        isHorizontal && picturePosition === "left" ? 12 : 0,
-      marginTop:
-        !isHorizontal && picturePosition === "bottom" ? 12 : 0,
-      marginBottom:
-        !isHorizontal && picturePosition === "top" ? 12 : 0,
-      ...(picturePaddings
-        ? { padding: 12, boxSizing: "border-box" }
-        : {}),
-      ...styles.image,
-    });
-
-    // 4) Content
-    const Content = styled.div({
-      flex: 1,
-      padding: 20,
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-between",
-      ...styles.card,
-    });
-
-    const Title = styled.h3({
+    const Title = styled.h3(userTitleStyles, { 
       margin: 0,
-      fontSize: "1.1rem",
-      color: theme.textColor,
-      ...styles.title,
+      fontSize: "clamp(0.9rem, 0.5vw + 0.8rem, 1.2rem)",
+      color: theme.textColor, 
+      fontWeight: 600,
     });
 
-    const Text = styled.div({
-      fontSize: "0.85rem",
+    const Text = styled.div(userTextStyles, {
+      fontSize: "clamp(0.8rem, 0.4vw + 0.7rem, 1rem)",
       color: theme.textColor,
       margin: "8px 0 12px",
-      lineHeight: 1.4,
-      ...styles.text,
+      lineHeight: 1.5,
     });
 
-    const PriceTag = styled.div({
-      fontSize: "1.3rem",
+    const PriceTag = styled.div(userPriceStyles, {
+      fontSize: "clamp(1rem, 0.6vw + 0.8rem, 1.5rem)",
       fontWeight: 600,
       color: theme.primaryColor,
-      ...styles.price,
     });
 
-    const Button = styled.button({
+    const Button = styled.button(userButtonStyles, {
       backgroundColor: theme.primaryColor,
       color: "#fff",
       border: "none",
       padding: "10px 16px",
       borderRadius: 6,
       cursor: "pointer",
-      fontSize: "0.9rem",
-      alignSelf: isHorizontal ? "flex-start" : "center",
-      ...styles.button,
+      fontSize: "clamp(0.8rem, 0.5vw + 0.7rem, 1rem)",
+      alignSelf: isHorizontalLayout ? "flex-start" : "center",
+      marginTop: "auto",
     });
 
     const descContent: ReactNode[] = description.map(
       (line: string, i: number) => (
         <span key={i}>
           {line}
-          <br />
+          {i < description.length -1 && <br />}
         </span>
       )
     );
-
+    
     return (
-      <Card onClick={!useButton ? this.onCardClick : undefined}>
-        {(picturePosition === "top" ||
-          picturePosition === "left") &&
-          productImage && <Image src={productImage} alt={productName} />}
+      <>
+        <Global styles={globalStyles} /> 
+        {fontUrl && (
+          <style dangerouslySetInnerHTML={{ __html: `@import url('${fontUrl}');` }} />
+        )}
+        <StyledCard
+          userCardStyleProps={userCardStyles} 
+          isHorizontalProp={isHorizontalLayout}
+          cardBorderRadiusProp={cardRadius}
+          enableAnimationProp={enableAnimation}
+          themeFont={theme.font}
+          themeSecondaryBackgroundColor={theme.secondaryBackgroundColor}
+          onClick={this.onCardClick} 
+          picturePositionProp={picturePosition} 
+          mobileBreakpointBehaviorProp={mobileBreakpointBehavior}
+          hasButton={showButton} 
+        >
+          {(picturePosition === "top" || picturePosition === "left") && productImage && (
+              <StyledImageContainer
+                isHorizontalProp={isHorizontalLayout}
+                imageWidthPercentProp={imageWidthPercent}
+                picturePositionProp={picturePosition}
+                mobileBreakpointBehaviorProp={mobileBreakpointBehavior}
+                imageAspectRatioProp={imageAspectRatio} 
+                cardBorderRadiusProp={cardRadius} 
+              >
+                <ImgComponent
+                  src={productImage}
+                  alt={productName}
+                  userImageStyleProps={userImageStyles} 
+                  imageAspectRatioProp={imageAspectRatio} 
+                  imageObjectFitProp={imageObjectFit}
+                />
+              </StyledImageContainer>
+            )}
 
-        <Content>
-          <Title>{productName}</Title>
-          {description.length > 0 && <Text>{descContent}</Text>}
-          {price && <PriceTag>{price}</PriceTag>}
-          {useButton && (
-            <Button onClick={this.onButtonClick}>{buttonText}</Button>
-          )}
-        </Content>
+          <StyledContent
+            isHorizontalProp={isHorizontalLayout}
+            userContentStyleProps={userTextStyles} 
+            mobileBreakpointBehaviorProp={mobileBreakpointBehavior}
+            picturePositionProp={picturePosition} 
+          >
+            <Title>{productName}</Title>
+            {description.length > 0 && <Text>{descContent}</Text>}
+            {price && <PriceTag>{price}</PriceTag>}
+            {showButton && ( 
+              <Button onClick={this.onButtonClick}>{buttonText}</Button>
+            )}
+          </StyledContent>
 
-        {(picturePosition === "bottom" ||
-          picturePosition === "right") &&
-          productImage && <Image src={productImage} alt={productName} />}
-      </Card>
+          {(picturePosition === "bottom" || picturePosition === "right") && productImage && (
+               <StyledImageContainer
+                isHorizontalProp={isHorizontalLayout}
+                imageWidthPercentProp={imageWidthPercent}
+                picturePositionProp={picturePosition}
+                mobileBreakpointBehaviorProp={mobileBreakpointBehavior}
+                imageAspectRatioProp={imageAspectRatio}
+                cardBorderRadiusProp={cardRadius} 
+              >
+                <ImgComponent
+                  src={productImage}
+                  alt={productName}
+                  userImageStyleProps={userImageStyles} 
+                  imageAspectRatioProp={imageAspectRatio}
+                  imageObjectFitProp={imageObjectFit}
+                />
+              </StyledImageContainer>
+            )}
+        </StyledCard>
+      </>
     );
   }
 }
+
+interface StyledCardProps {
+  userCardStyleProps: EmotionCompatibleStyle; 
+  isHorizontalProp: boolean;
+  cardBorderRadiusProp: string;
+  enableAnimationProp: boolean;
+  themeFont?: string;
+  themeSecondaryBackgroundColor?: string;
+  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  picturePositionProp: PicturePosition; 
+  mobileBreakpointBehaviorProp: MobileBreakpointBehavior; 
+  hasButton: boolean; 
+}
+
+interface StyledImageContainerProps {
+  isHorizontalProp: boolean;
+  imageWidthPercentProp: number;
+  picturePositionProp: PicturePosition;
+  mobileBreakpointBehaviorProp: MobileBreakpointBehavior; 
+  imageAspectRatioProp: string; 
+  cardBorderRadiusProp: string; 
+}
+
+interface ImgComponentProps {
+  userImageStyleProps: EmotionCompatibleStyle;
+  imageAspectRatioProp: string;
+  imageObjectFitProp: CSS.Property.ObjectFit; 
+}
+
+interface StyledContentProps {
+  isHorizontalProp: boolean;
+  userContentStyleProps: EmotionCompatibleStyle; 
+  mobileBreakpointBehaviorProp: MobileBreakpointBehavior; 
+  picturePositionProp: PicturePosition;
+}
+
+const ImgComponent = styled.img<ImgComponentProps>(props => {
+  let imageSpecificAspectRatio: CSS.Property.AspectRatio;
+  switch (props.imageAspectRatioProp) {
+    case "native":
+      imageSpecificAspectRatio = "auto";
+      break;
+    default:
+      imageSpecificAspectRatio = props.imageAspectRatioProp === "1/1" ? "1 / 1" : props.imageAspectRatioProp;
+  }
+
+  const baseImageStyles: React.CSSProperties = {
+    display: "block",
+    width: "100%", 
+    height: imageSpecificAspectRatio === "auto" && props.imageAspectRatioProp === "native" ? "auto" : "100%",
+    objectFit: (props.userImageStyleProps['object-fit'] as CSS.Property.ObjectFit) || 
+               (props.userImageStyleProps.objectFit as CSS.Property.ObjectFit) || 
+               props.imageObjectFitProp,
+  };
+  if (imageSpecificAspectRatio === "auto" && props.imageAspectRatioProp === "native") {
+    baseImageStyles.aspectRatio = imageSpecificAspectRatio;
+  }
+
+  return {
+    ...baseImageStyles,
+    ...props.userImageStyleProps, 
+  };
+});
+
+const StyledImageContainer = styled.div<StyledImageContainerProps>(props => {
+  const isCurrentlyHorizontal = props.isHorizontalProp &&
+    !( (props.mobileBreakpointBehaviorProp === 'stack top' || props.mobileBreakpointBehaviorProp === 'stack bottom') && 
+        typeof window !== 'undefined' && window.innerWidth <= 600);
+
+  const baseStyles: CSS.Properties<string | number> = { 
+    display: 'flex', 
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden', 
+    flexShrink: isCurrentlyHorizontal ? 0 : undefined, 
+    width: isCurrentlyHorizontal ? `${props.imageWidthPercentProp}%` : "100%",
+    marginLeft: isCurrentlyHorizontal && props.picturePositionProp === "right" ? "12px" : "0",
+    marginRight: isCurrentlyHorizontal && props.picturePositionProp === "left" ? "12px" : "0",
+    marginTop: !isCurrentlyHorizontal && props.picturePositionProp === "bottom" ? "12px" : "0",
+    marginBottom: !isCurrentlyHorizontal && props.picturePositionProp === "top" ? "12px" : "0",
+    borderRadius: props.isHorizontalProp
+      ? props.picturePositionProp === "left"
+        ? `${props.cardBorderRadiusProp} 0 0 ${props.cardBorderRadiusProp}`
+        : `0 ${props.cardBorderRadiusProp} ${props.cardBorderRadiusProp} 0`
+      : props.picturePositionProp === "top"
+      ? `${props.cardBorderRadiusProp} ${props.cardBorderRadiusProp} 0 0`
+      : `0 0 ${props.cardBorderRadiusProp} ${props.cardBorderRadiusProp}`,
+  };
+  
+  const propAspectRatio = props.imageAspectRatioProp;
+  if (propAspectRatio !== "native") { 
+      baseStyles.aspectRatio = propAspectRatio === "1/1" ? "1 / 1" : propAspectRatio;
+  }
+
+  let responsiveStyles = {};
+  if (props.isHorizontalProp && (props.mobileBreakpointBehaviorProp === 'stack top' || props.mobileBreakpointBehaviorProp === 'stack bottom')) {
+    const mobileSpecificStyles: CSS.Properties<string | number> = {
+        width: "100%", 
+        flexBasis: "auto", 
+        flexShrink: undefined,
+        marginLeft: "0",
+        marginRight: "0",
+        marginTop: "0", 
+        marginBottom: "0",
+        borderRadius: props.mobileBreakpointBehaviorProp === 'stack top' 
+            ? `${props.cardBorderRadiusProp} ${props.cardBorderRadiusProp} 0 0` 
+            : `0 0 ${props.cardBorderRadiusProp} ${props.cardBorderRadiusProp}`,
+    };
+    if (props.mobileBreakpointBehaviorProp === 'stack top') { 
+        mobileSpecificStyles.marginBottom = "12px";
+    } else { 
+        mobileSpecificStyles.marginTop = "12px";
+    }
+    responsiveStyles = {
+        "@media (max-width: 600px)": mobileSpecificStyles
+    };
+  }
+  return {
+    ...baseStyles,
+    ...responsiveStyles, 
+  };
+});
+
+const StyledCard = styled.div<StyledCardProps>(props => {
+  const baseStyles: React.CSSProperties = {
+    display: "flex",
+    width: "100%", 
+    height: "auto",
+    fontFamily: `${props.themeFont}, sans-serif`,
+    backgroundColor: props.themeSecondaryBackgroundColor,
+    borderRadius: props.cardBorderRadiusProp,
+    boxShadow: "0 6px 20px rgba(0,0,0,0.08)", 
+    overflow: "hidden", 
+    position: "relative",
+    cursor: props.hasButton ? "default" : (props.onClick ? "pointer" : "default"),
+    flexDirection: props.isHorizontalProp ? "row" : "column",
+  };
+
+  const conditionalStyles: EmotionCompatibleStyle = {}; 
+
+  if (props.enableAnimationProp) {
+    conditionalStyles.willChange = "transform, box-shadow"; 
+    conditionalStyles.transition = "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out"; 
+    conditionalStyles["&:hover"] = { 
+      transform: "scale(1.03)",
+      boxShadow: "0 8px 25px rgba(0,0,0,0.12)",
+    };
+    conditionalStyles["&:active"] = { 
+      transform: "scale(0.98)",
+    };
+  }
+  
+  if (props.isHorizontalProp) { 
+    let mobileFlexDirection: CSS.Property.FlexDirection = "column"; 
+
+    if (props.mobileBreakpointBehaviorProp === "stack top") {
+        mobileFlexDirection = props.picturePositionProp === "right" ? "column-reverse" : "column";
+    } else if (props.mobileBreakpointBehaviorProp === "stack bottom") {
+        mobileFlexDirection = props.picturePositionProp === "left" ? "column-reverse" : "column";
+    }
+     if (props.mobileBreakpointBehaviorProp === "stack top" || props.mobileBreakpointBehaviorProp === "stack bottom") {
+        conditionalStyles["@media (max-width: 600px)"] = {
+          ...(conditionalStyles["@media (max-width: 600px)"] as object), 
+          flexDirection: mobileFlexDirection, 
+        };
+     }
+  }
+  
+  return {
+    ...baseStyles,
+    ...conditionalStyles,
+    ...props.userCardStyleProps, 
+  };
+});
+
+const StyledContent = styled.div<StyledContentProps>(props => {
+  const baseStyles: React.CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center", 
+    padding: "20px",
+    minWidth: 0, 
+    boxSizing: "border-box",
+    flexGrow: props.isHorizontalProp ? 1 : undefined, 
+    flexBasis: props.isHorizontalProp ? "0px" : "auto",  
+    width: "100%", 
+  };
+  
+  const responsiveStyles: EmotionCompatibleStyle = {}; 
+  if (props.isHorizontalProp && (props.mobileBreakpointBehaviorProp === 'stack top' || props.mobileBreakpointBehaviorProp === 'stack bottom')) {
+     const mobileSpecificContentStyles: React.CSSProperties = {
+        flexGrow: 0, 
+        flexBasis: "auto",
+        width: "100%", 
+        padding: "20px", 
+     };
+     if (props.mobileBreakpointBehaviorProp === 'stack top'){ 
+        mobileSpecificContentStyles.paddingTop = (props.picturePositionProp === "left" || props.picturePositionProp === "right") ? "0px" : "20px";
+     }
+     if (props.mobileBreakpointBehaviorProp === 'stack bottom'){ 
+        mobileSpecificContentStyles.paddingBottom = (props.picturePositionProp === "left" || props.picturePositionProp === "right") ? "0px" : "20px";
+     }
+     responsiveStyles["@media (max-width: 600px)"] = mobileSpecificContentStyles;
+  }
+
+  return {
+    ...baseStyles,
+    ...responsiveStyles,
+    ...props.userContentStyleProps, 
+  };
+});
 
 export default withStreamlitConnection(ProductCardComponent);
