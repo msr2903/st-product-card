@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="streamlit-product-card",
-    version="0.1.2",
+    version="0.1.3",
     author="msr2903",
     author_email="michaelpersonal67@gmail.com",
     description="An e-commerce product card component for Streamlit",
