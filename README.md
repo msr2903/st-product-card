@@ -7,6 +7,8 @@
 
 A flexible and customizable Streamlit component designed to display product-like information cards within your applications. This component offers a range of features for controlling layout, image display, responsive behavior, styling, and interactivity.
 
+See the demo [here](https://st-pdcard-demo.streamlit.app).
+
 ## Features
 
 * **Flexible Content:** Display name, description (single string or list), price, image, and an optional button.
