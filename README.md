@@ -1,5 +1,6 @@
 # Streamlit Product Card Component
 
+<img src="/assets/streamlit-product-card.jpg">
 A flexible and customizable Streamlit component designed to display product-like information cards within your applications. This component offers a range of features for controlling layout, image display, responsive behavior, styling, and interactivity.
 
 ## Features
@@ -25,8 +26,9 @@ from streamlit_product_card import product_card
 import streamlit as st
 ```
 
-### Basic Example
+### Simple Example
 
+<img src="/assets/simple-product.jpg">
 ```python
 import streamlit as st
 from streamlit_product_card import product_card
@@ -48,6 +50,7 @@ if clicked_basic:
 
 ### Advanced Example
 
+<img src="/assets/advanced-product.jpg">
 ```python
 import streamlit as st
 from streamlit_product_card import product_card

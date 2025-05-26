@@ -8,10 +8,24 @@ import styled from "@emotion/styled";
 import { Global, css } from '@emotion/react'; 
 import * as CSS from 'csstype'; 
 
+const kebabToCamel = (str: string): string => {
+  return str.replace(/-([a-z0-9])/g, (match, char) => char.toUpperCase());
+};
+
+const transformKebabCaseStyles = (styleObj?: { [key: string]: any }): React.CSSProperties => {
+  if (!styleObj) return {};
+  const newStyles: { [key: string]: any } = {}; 
+  for (const key in styleObj) {
+    if (Object.prototype.hasOwnProperty.call(styleObj, key)) {
+      newStyles[kebabToCamel(key)] = styleObj[key];
+    }
+  }
+  return newStyles as React.CSSProperties; 
+};
+
 type PicturePosition = "top" | "bottom" | "left" | "right";
 type MobileBreakpointBehavior = "stack top" | "stack bottom" | "shrink" | "none";
 type EmotionCompatibleStyle = { [key: string]: any };
-
 
 interface ProductCardArgs {
   productName: string;
@@ -111,12 +125,13 @@ class ProductCardComponent extends StreamlitComponentBase<ProductCardProps> {
       mobileBreakpointBehavior,
     } = args;
 
-    const userCardStyles = styles.card || {};
-    const userImageStyles = styles.image || {};
-    const userTextStyles = styles.text || {};
-    const userTitleStyles = styles.title || {};
-    const userPriceStyles = styles.price || {};
-    const userButtonStyles = styles.button || {};
+    // Transform kebab-case keys from Python styles to camelCase for React/Emotion
+    const userCardStyles = transformKebabCaseStyles(styles.card);
+    const userImageStyles = transformKebabCaseStyles(styles.image);
+    const userTextStyles = transformKebabCaseStyles(styles.text);
+    const userTitleStyles = transformKebabCaseStyles(styles.title);
+    const userPriceStyles = transformKebabCaseStyles(styles.price);
+    const userButtonStyles = transformKebabCaseStyles(styles.button);
 
     const isHorizontalLayout =
       picturePosition === "left" || picturePosition === "right";
@@ -124,7 +139,7 @@ class ProductCardComponent extends StreamlitComponentBase<ProductCardProps> {
     const showButton = buttonText && buttonText.trim() !== "";
 
     const defaultRadius = 12;
-    const rawBorderRadius = userCardStyles['border-radius'] || userCardStyles.borderRadius; 
+    const rawBorderRadius = userCardStyles.borderRadius; 
     const cardRadius =
       typeof rawBorderRadius === "string"
         ? rawBorderRadius
@@ -132,27 +147,31 @@ class ProductCardComponent extends StreamlitComponentBase<ProductCardProps> {
         ? `${rawBorderRadius}px`
         : `${defaultRadius}px`;
 
-    const Title = styled.h3(userTitleStyles, { 
+    // Define styled components by merging defaults and user styles into a single object
+    const Title = styled.h3({ 
       margin: 0,
       fontSize: "clamp(0.9rem, 0.5vw + 0.8rem, 1.2rem)",
       color: theme.textColor, 
       fontWeight: 600,
+      ...userTitleStyles, // User styles spread last to override defaults
     });
 
-    const Text = styled.div(userTextStyles, {
+    const Text = styled.div({
       fontSize: "clamp(0.8rem, 0.4vw + 0.7rem, 1rem)",
       color: theme.textColor,
       margin: "8px 0 12px",
       lineHeight: 1.5,
+      ...userTextStyles,
     });
 
-    const PriceTag = styled.div(userPriceStyles, {
+    const PriceTag = styled.div({
       fontSize: "clamp(1rem, 0.6vw + 0.8rem, 1.5rem)",
       fontWeight: 600,
       color: theme.primaryColor,
+      ...userPriceStyles,
     });
 
-    const Button = styled.button(userButtonStyles, {
+    const Button = styled.button({
       backgroundColor: theme.primaryColor,
       color: "#fff",
       border: "none",
@@ -162,6 +181,7 @@ class ProductCardComponent extends StreamlitComponentBase<ProductCardProps> {
       fontSize: "clamp(0.8rem, 0.5vw + 0.7rem, 1rem)",
       alignSelf: isHorizontalLayout ? "flex-start" : "center",
       marginTop: "auto",
+      ...userButtonStyles,
     });
 
     const descContent: ReactNode[] = description.map(
@@ -249,7 +269,7 @@ class ProductCardComponent extends StreamlitComponentBase<ProductCardProps> {
 }
 
 interface StyledCardProps {
-  userCardStyleProps: EmotionCompatibleStyle; 
+  userCardStyleProps: React.CSSProperties; 
   isHorizontalProp: boolean;
   cardBorderRadiusProp: string;
   enableAnimationProp: boolean;
@@ -271,14 +291,14 @@ interface StyledImageContainerProps {
 }
 
 interface ImgComponentProps {
-  userImageStyleProps: EmotionCompatibleStyle;
+  userImageStyleProps: React.CSSProperties; 
   imageAspectRatioProp: string;
   imageObjectFitProp: CSS.Property.ObjectFit; 
 }
 
 interface StyledContentProps {
   isHorizontalProp: boolean;
-  userContentStyleProps: EmotionCompatibleStyle; 
+  userContentStyleProps: React.CSSProperties; 
   mobileBreakpointBehaviorProp: MobileBreakpointBehavior; 
   picturePositionProp: PicturePosition;
 }
@@ -297,17 +317,18 @@ const ImgComponent = styled.img<ImgComponentProps>(props => {
     display: "block",
     width: "100%", 
     height: imageSpecificAspectRatio === "auto" && props.imageAspectRatioProp === "native" ? "auto" : "100%",
-    objectFit: (props.userImageStyleProps['object-fit'] as CSS.Property.ObjectFit) || 
-               (props.userImageStyleProps.objectFit as CSS.Property.ObjectFit) || 
-               props.imageObjectFitProp,
+    objectFit: props.userImageStyleProps.objectFit || props.imageObjectFitProp,
   };
-  if (imageSpecificAspectRatio === "auto" && props.imageAspectRatioProp === "native") {
+  if (props.imageAspectRatioProp === "native") { 
     baseImageStyles.aspectRatio = imageSpecificAspectRatio;
   }
 
   return {
     ...baseImageStyles,
     ...props.userImageStyleProps, 
+    objectFit: props.userImageStyleProps.objectFit || props.imageObjectFitProp,
+    ...( (props.imageAspectRatioProp === "native" && !props.userImageStyleProps.aspectRatio) && 
+        { aspectRatio: imageSpecificAspectRatio } )
   };
 });
 
@@ -316,7 +337,7 @@ const StyledImageContainer = styled.div<StyledImageContainerProps>(props => {
     !( (props.mobileBreakpointBehaviorProp === 'stack top' || props.mobileBreakpointBehaviorProp === 'stack bottom') && 
         typeof window !== 'undefined' && window.innerWidth <= 600);
 
-  const baseStyles: CSS.Properties<string | number> = { 
+  const baseStyles: CSS.Properties<string | number> & { [key: string]: any } = { 
     display: 'flex', 
     justifyContent: 'center',
     alignItems: 'center',
@@ -385,7 +406,7 @@ const StyledCard = styled.div<StyledCardProps>(props => {
     flexDirection: props.isHorizontalProp ? "row" : "column",
   };
 
-  const conditionalStyles: EmotionCompatibleStyle = {}; 
+  const conditionalStyles: { [key: string]: any } = {}; 
 
   if (props.enableAnimationProp) {
     conditionalStyles.willChange = "transform, box-shadow"; 
@@ -435,7 +456,7 @@ const StyledContent = styled.div<StyledContentProps>(props => {
     width: "100%", 
   };
   
-  const responsiveStyles: EmotionCompatibleStyle = {}; 
+  const responsiveStyles: { [key: string]: any } = {}; 
   if (props.isHorizontalProp && (props.mobileBreakpointBehaviorProp === 'stack top' || props.mobileBreakpointBehaviorProp === 'stack bottom')) {
      const mobileSpecificContentStyles: React.CSSProperties = {
         flexGrow: 0, 
@@ -460,3 +481,4 @@ const StyledContent = styled.div<StyledContentProps>(props => {
 });
 
 export default withStreamlitConnection(ProductCardComponent);
+

@@ -15,9 +15,9 @@ IMG_PORTRAIT = "https://placehold.co/400x600/FFCB9A/D24136?text=Portrait+400x600
 IMG_SQUARE_PLACEHOLDER = "https://placehold.co/500x500/C9E4DE/2C3532?text=Square+500x500"
 IMG_WIDE = "https://placehold.co/800x300/F2D096/8E5044?text=Wide+800x300"
 IMG_ANIMATION = "https://placehold.co/400x400/FFDAB9/8B4513?text=Animation+Demo"
-IMG_FONT_1 = "https://placehold.co/400x200/E6E6FA/483D8B?text=Font+1"
-IMG_FONT_2 = "https://placehold.co/400x200/D2E0BF/556B2F?text=Font+2"
-IMG_FONT_3 = "https://placehold.co/400x200/FFDAB9/A0522D?text=Font+3"
+IMG_FONT_MOCHIY = "https://placehold.co/400x250/05402A/F0FFF0?text=Mochiy+Pop+P+One+Font+-+Work+Sans"
+IMG_FONT_CLAUDE = "https://placehold.co/400x400/E8E7DD/3C3A2A?text=Space+Grotesk"
+IMG_FONT_VINTAGE = "https://placehold.co/400x400/53372E/D7CDC6?text=Old+Standard+TT+Fonts+-+Roboto+Slab"
 IMG_CUSTOM_STYLES = "https://placehold.co/450x300/D3D3D3/000000?text=Custom+Styles"
 IMG_MOBILE_STACK_TOP = "https://placehold.co/400x250/A2D2FF/003049?text=Stack+Top"
 IMG_MOBILE_STACK_BOTTOM = "https://placehold.co/400x250/FBC4AB/D45769?text=Stack+Bottom" 
@@ -48,10 +48,10 @@ def demo_core_content_fields():
     st.subheader("1. Only Product Name (All Optional Fields Empty/None)")
     product_card(
         product_name="Product Name Only",
-        description=None, # or "" or []
-        price=None,       # or ""
-        product_image=None, # or ""
-        button_text=None,   # or ""
+        description=None, 
+        price=None,       
+        product_image=None, 
+        button_text=None,   
         key="core_name_only"
     )
 
@@ -73,7 +73,7 @@ def demo_core_content_fields():
     product_card(
         product_name="Art Print",
         product_image=IMG_MINIMAL_DEMO,
-        image_aspect_ratio="1/1", # Give it a defined shape for this demo
+        image_aspect_ratio="1/1", 
         key="core_name_image"
     )
 
@@ -110,7 +110,6 @@ def demo_picture_position():
                 price="€25",
                 product_image=f"https://placehold.co/300x200/FEA889/4A403A?text=Pos: {pos.upper()}",
                 picture_position=pos,
-                # For left/right, ensure there's enough content or fixed card size to see effect
                 styles={"card": {"min-height": "300px"} if pos in ["left", "right"] else {}},
                 image_aspect_ratio="3/2",
                 key=f"pic_pos_{pos}"
@@ -127,11 +126,11 @@ def demo_picture_position():
                 price="€25",
                 product_image=f"https://placehold.co/300x200/FEA889/4A403A?text=Pos: {pos.upper()}",
                 picture_position=pos,
-                # For left/right, ensure there's enough content or fixed card size to see effect
                 styles={"card": {"min-height": "300px"} if pos in ["left", "right"] else {}},
                 image_aspect_ratio="3/2",
-                key=f"pic_pos_{pos}"
+                key=f"pic_pos_{pos}_hor" # Ensure unique key
             )
+
 
 def demo_image_display_settings():
     st.header("🖼️ Image Display Settings (`image_aspect_ratio` & `image_object_fit`)")
@@ -177,32 +176,33 @@ def demo_image_width_percent():
     
     st.subheader("1. Various Percentages (Image Left)")
     percentages = [15, 30, 50, 75]
+    # Displaying these vertically for better readability in centered layout
     for i, percent in enumerate(percentages):
-        st.markdown(f"**{percent}%**")
+        st.markdown(f"**Image Left: {percent}%**")
         product_card(
             product_name=f"Img: {percent}%",
-            description="Text fills remaining space.",
+            description="Text fills remaining space. Card has a min-height for this demo.",
             price=f"€{percent * 2}",
             product_image=f"https://placehold.co/400x300/B2EBF2/00796B?text={percent}%25",
             picture_position="left",
             image_width_percent=percent,
-            image_aspect_ratio="4/3", # Fixed aspect ratio for consistent demo
-            styles={"card": {"min-height": "250px"}},
+            image_aspect_ratio="4/3", 
+            styles={"card": {"min-height": "200px", "margin-bottom": "20px"}}, # Added margin
             key=f"img_width_left_{percent}"
         )
             
     st.subheader("2. Various Percentages (Image Right)")
     for i, percent in enumerate(percentages):
-        st.markdown(f"**{percent}%**")
+        st.markdown(f"**Image Right: {percent}%**")
         product_card(
             product_name=f"Img: {percent}%",
-            description="Text fills remaining space.",
+            description="Text fills remaining space. Card has a min-height for this demo.",
             price=f"€{percent * 2.5}",
             product_image=f"https://placehold.co/400x300/FFCCBC/BF360C?text={percent}%25",
             picture_position="right",
             image_width_percent=percent,
             image_aspect_ratio="4/3",
-            styles={"card": {"min-height": "250px"}},
+            styles={"card": {"min-height": "200px", "margin-bottom": "20px"}}, # Added margin
             key=f"img_width_right_{percent}"
         )
 
@@ -210,60 +210,90 @@ def demo_custom_fonts():
     st.header("🔤 Custom Fonts (`font_url`)")
     st.markdown("Demonstrates loading and applying custom fonts using the `font_url` prop and `styles` for specific elements.")
 
-    st.subheader("Example 1: Playful Title, Readable Body")
+    st.subheader("Example 1: Mochiy Pop P One & Work Sans")
     product_card(
-        product_name="Funky Fresh Tees",
-        description="Our tees are made with 100% organic cotton and a dash of pure awesome. Get yours today!",
-        price="€29.99",
-        product_image=IMG_FONT_1,
-        picture_position="top",
-        image_aspect_ratio="4/2",
-        font_url="https://fonts.googleapis.com/css2?family=Pacifico&family=Open+Sans:wght@400;700&display=swap",
+        product_name="Kawaii Matcha Delight", # Changed product name
+        description=[
+            "A super cute and energizing matcha latte, crafted with premium Uji matcha.",
+            "Topped with adorable latte art for an extra smile!"
+        ],
+        price="¥850", # Changed price
+        product_image=IMG_FONT_MOCHIY, # Using a dedicated image
+        picture_position="top", # Changed for better focus on text
+        image_aspect_ratio="400/250", # Adjusted to image
+        font_url="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Work+Sans:wght@300;400;600;700&display=swap",
         styles={
-            "card": {"font-family": "'Open Sans', sans-serif"},
-            "title": {"font-family": "'Pacifico', cursive", "font-size": "2rem", "color": "#ff69b4"},
-            "text": {"font-family": "'Open Sans', sans-serif"},
-            "price": {"font-weight": "700"},
+            "card": {"font-family": "'Work Sans', sans-serif","background-color": "#F0FFF0"},
+            "title": {
+                "font-family": "'Mochiy Pop P One', sans-serif", 
+                "font-size": "2.0em",
+                "color": "#2E8B57",
+                "margin-bottom": "10px"
+            },
+            "text": {
+                "font-family": "'Work Sans', sans-serif",
+                "font-size": "1.0em", # Example font size
+                "color": "#4A4A4A",    # Darker gray for text
+                "line-height": "1.6"
+            },
+            "price": {
+                "font-family": "'Work Sans', sans-serif",
+                "font-size": "1.3em",   # Example font size
+                "font-weight": "600",   # Semi-bold
+                "color": "#3CB371",     # MediumSeaGreen
+                "margin-top": "10px"
+            },
+            "button": {
+                "font-family": "'Work Sans', sans-serif", 
+                "font-weight": "600",
+                "background-color": "#3CB371",
+                "color": "white",
+                "font-size": "0.9em"
+            }
         },
-        button_text="Shop Now",
-        key="font_example_1"
+        button_text="Order Now!",
+        key="font_example_mochiy_work_sans"
     )
 
-    st.subheader("Example 2: Modern & Minimal")
+
+    st.subheader("Example 2: Claude Style Product Button (Space Grotesk)")
     product_card(
-        product_name="Minimalist Desk Lamp",
-        description="Sleek design, warm light. Perfect for your modern workspace.",
+        product_name="Claude Style Product Button",
+        description="You can pass any fonts from Google Fonts to make it look like what you want. This example uses Space Grotesk to make it looks like Claude Design.",
         price="€75.00",
-        product_image=IMG_FONT_2,
+        product_image=IMG_FONT_CLAUDE,
         picture_position="left",
         image_width_percent=35,
         image_aspect_ratio="1/1",
-        font_url="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&family=Raleway:wght@700&display=swap",
+        font_url="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap",
         styles={
-            "card": {"font-family": "'Montserrat', sans-serif", "font-weight": "300"},
-            "title": {"font-family": "'Raleway', sans-serif", "font-weight": "700", "letter-spacing": "1px"},
-            "price": {"font-family": "'Montserrat', sans-serif", "font-weight": "500"},
-            "button": {"font-family": "'Montserrat', sans-serif", "font-weight": "500"},
+            "card": {"background-color": "#F4F3ED",},
+            "title": {"font-family": "'Space Grotesk', sans-serif", "font-weight": "700", "letter-spacing": "1px", "font-size": "1.7em", "color": "#3C3A2A"},
+            "text": {"font-family": "'Space Grotesk', sans-serif","font-size": "0.9em", "color": "#3C3A2A"},
+            "price": {"font-family": "'Space Grotesk', sans-serif", "font-weight": "500", "font-size": "1.1em", "color": "#BB5A38"},
+            "button": {"font-family": "'Space Grotesk', sans-serif", "font-weight": "500", "background-color": "#BB5A38"},
         },
         button_text="Details",
         key="font_example_2"
     )
 
-    st.subheader("Example 3: Vintage Newspaper Style")
+    st.subheader("Example 3: Vintage Newspaper Style (Old Standard TT & Roboto Slab)")
     product_card(
         product_name="The Daily Chronicle",
         description="Extra! Extra! Read all about the latest happenings in the world of vintage product cards. Get your copy today!",
         price="€0.50",
-        product_image=IMG_FONT_3,
+        product_image=IMG_FONT_VINTAGE,
         picture_position="right",
         image_width_percent=25,
-        image_aspect_ratio="native",
+        image_aspect_ratio="1/1",
+        image_object_fit="cover",
         font_url="https://fonts.googleapis.com/css2?family=Old+Standard+TT:wght@400;700&family=Roboto+Slab:wght@400&display=swap",
         styles={
-            "card": {"font-family": "'Roboto Slab', serif",},
-            "title": {"font-family": "'Old Standard TT', serif",},
-            "text": {"font-family": "'Roboto Slab', serif", "line-height": "1.6"},
-            "price": {"font-family": "'Old Standard TT', serif", "font-weight": "400"},
+            "card": {"background-color": "#D7CDC6",}, 
+            "title": {"font-family": "'Old Standard TT', serif", "font-weight": "700", "font-size": "1.8em", "color": "#5d4037"},
+            "text": {"font-family": "'Roboto Slab', serif", "line-height": "1.6", "font-size": "0.9em", "color": "#5d4037"},
+            "price": {"font-family": "'Old Standard TT', serif", "font-weight": "400", "font-size": "1.1em", "color": "#5d4037"},
+            "button": {"font-family": "'Roboto Slab', serif", "font-weight": "400", "font-size": "0.9em", "background-color": "#53372E",}
         },
         button_text="Read More",
         key="font_example_3"
@@ -275,8 +305,8 @@ def demo_on_button_click():
     st.markdown(
         """
         This demonstrates the `on_button_click` callback.
-        - If a `button_text` is provided (and thus a button is rendered), only the button click triggers the callback.
-        - If `button_text` is empty or `None` (no button), the entire card click triggers the callback.
+        - If a `button_text` is provided, only the button click triggers the callback.
+        - If `button_text` is empty or `None`, the entire card click triggers the callback.
         """
     )
 
@@ -285,7 +315,8 @@ def demo_on_button_click():
 
     def handle_card_click(card_name):
         st.session_state.click_message = f"'{card_name}' was clicked!"
-        # In a real app, you might navigate, add to cart, etc.
+        st.toast(f"Clicked: {card_name}")
+
 
     st.info(f"Last event: {st.session_state.click_message}")
 
@@ -306,7 +337,7 @@ def demo_on_button_click():
         description="Click anywhere on this card.",
         price="€20.00",
         product_image=IMG_CLICK_DEMO,
-        button_text="", # No button text means no button
+        button_text="", 
         on_button_click=lambda: handle_card_click("Clickable Card Area"),
         key="click_demo_no_button"
     )
@@ -314,11 +345,10 @@ def demo_on_button_click():
     st.subheader("3. Card with Button (No Callback Attached)")
     product_card(
         product_name="Button, No Action",
-        description="This button exists but has no `on_button_click` callback assigned to this card.",
+        description="This button exists but has no `on_button_click` callback.",
         price="€15.00",
         product_image=IMG_CLICK_DEMO,
         button_text="Button (No Op)",
-        # on_button_click is None by default
         key="click_demo_button_no_op"
     )
 
@@ -352,7 +382,7 @@ def demo_styling_and_animation_streamlined():
                 "box-shadow": "0 10px 30px rgba(0, 123, 255, 0.3)",
                 "background-color": "#f0f8ff", "max-width": "400px", "margin": "0 auto"
             },
-            "image": { # Example of adding padding to image via styles
+            "image": { 
                 "border": "5px dotted #28a745", "padding": "10px", "box-sizing": "border-box",
                 "border-radius": "15px", "background-color": "#e9f5e9"
             },
@@ -366,24 +396,18 @@ def demo_styling_and_animation_streamlined():
     )
 
 
-def demo_mobile_behavior():
+def demo_mobile_behavior(): 
     st.header("📱 Mobile Breakpoint Behavior")
     st.markdown("`mobile_breakpoint_behavior` for horizontal cards (<=600px). **Resize browser to observe.**")
     
     st.subheader("1. Behavior: `stack top` (Default)")
-    cols_stack_top = st.columns(2)
-    with cols_stack_top[0]:
-        product_card(product_name="Stack Top (Left Img)", description="Original: Img Left. Mobile: Img Top.", product_image=IMG_MOBILE_STACK_TOP, picture_position="left", image_width_percent=40, image_aspect_ratio="40/25", mobile_breakpoint_behavior="stack top", key="mobile_stack_top_left_page4")
-    with cols_stack_top[1]:
-        product_card(product_name="Stack Top (Right Img)", description="Original: Img Right. Mobile: Img Top.", product_image=IMG_MOBILE_STACK_TOP, picture_position="right", image_width_percent=40, image_aspect_ratio="40/25", mobile_breakpoint_behavior="stack top", key="mobile_stack_top_right_page4")
+    product_card(product_name="Stack Top (Left Img)", description="Original: Img Left. Mobile: Img Top.", product_image=IMG_MOBILE_STACK_TOP, picture_position="left", image_width_percent=40, image_aspect_ratio="40/25", mobile_breakpoint_behavior="stack top", key="mobile_stack_top_left_page4")
+    product_card(product_name="Stack Top (Right Img)", description="Original: Img Right. Mobile: Img Top.", product_image=IMG_MOBILE_STACK_TOP, picture_position="right", image_width_percent=40, image_aspect_ratio="40/25", mobile_breakpoint_behavior="stack top", key="mobile_stack_top_right_page4")
 
     st.divider()
     st.subheader("2. Behavior: `stack bottom`")
-    cols_stack_bottom = st.columns(2)
-    with cols_stack_bottom[0]:
-        product_card(product_name="Stack Bottom (Left Img)", description="Original: Img Left. Mobile: Img Bottom.", product_image=IMG_MOBILE_STACK_BOTTOM, picture_position="left", image_width_percent=40, image_aspect_ratio="40/25", mobile_breakpoint_behavior="stack bottom", key="mobile_stack_bottom_left_page4")
-    with cols_stack_bottom[1]:
-        product_card(product_name="Stack Bottom (Right Img)", description="Original: Img Right. Mobile: Img Bottom.", product_image=IMG_MOBILE_STACK_BOTTOM, picture_position="right", image_width_percent=40, image_aspect_ratio="40/25", mobile_breakpoint_behavior="stack bottom", key="mobile_stack_bottom_right_page4")
+    product_card(product_name="Stack Bottom (Left Img)", description="Original: Img Left. Mobile: Img Bottom.", product_image=IMG_MOBILE_STACK_BOTTOM, picture_position="left", image_width_percent=40, image_aspect_ratio="40/25", mobile_breakpoint_behavior="stack bottom", key="mobile_stack_bottom_left_page4")
+    product_card(product_name="Stack Bottom (Right Img)", description="Original: Img Right. Mobile: Img Bottom.", product_image=IMG_MOBILE_STACK_BOTTOM, picture_position="right", image_width_percent=40, image_aspect_ratio="40/25", mobile_breakpoint_behavior="stack bottom", key="mobile_stack_bottom_right_page4")
 
     st.divider()
     st.subheader("3. Behavior: `shrink` (Conceptual)")
