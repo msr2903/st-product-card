@@ -28,7 +28,7 @@ import streamlit as st
 
 ### Simple Example
 
-<img src="/assets/simple-product.jpg">
+<img src="/assets/simple-example.jpg">
 
 ```python
 import streamlit as st
@@ -51,7 +51,7 @@ if clicked_basic:
 
 ### Advanced Example
 
-<img src="/assets/advanced-product.jpg">
+<img src="/assets/advanced-example.jpg">
 
 ```python
 import streamlit as st
