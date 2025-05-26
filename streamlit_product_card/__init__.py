@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import streamlit as st # Import streamlit
 import streamlit.components.v1 as components
 
-_RELEASE = False
+_RELEASE = True
 _COMPONENT_NAME = "streamlit_product_card"
 
 if _RELEASE:
