@@ -7,13 +7,19 @@ import streamlit.components.v1 as components
 _RELEASE = True
 _COMPONENT_NAME = "streamlit_product_card"
 
+root_dir = os.path.dirname(os.path.abspath(__file__))
+build_dir = os.path.join(root_dir, "frontend", "build")
+
 if _RELEASE:
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    build_dir = os.path.join(root_dir, "frontend", "build")
+    if not os.path.isdir(build_dir):
+        raise FileNotFoundError(
+            f"Component build not found at {build_dir}. "
+            "Run 'npm run build' inside the frontend directory to generate it."
+        )
     _component = components.declare_component(_COMPONENT_NAME, path=build_dir)
 else:
     _component = components.declare_component(
-        _COMPONENT_NAME, url="http://localhost:3000" # Adjust port
+        _COMPONENT_NAME, url="http://localhost:3000"  # Adjust port
     )
 
 
