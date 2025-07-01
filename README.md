@@ -109,7 +109,7 @@ clicked_advanced = product_card(
             "color": "#141413"
         },
     },
-    mobile_breakpoint_behavior="stack top",
+    mobile_breakpoint_behavior="none",
     key="advanced_camera"
 )
 
@@ -134,7 +134,7 @@ The `product_card` function accepts the following parameters:
 | `image_width_percent`         | `Optional[int]`                    | `30`           | Percentage (0-100) for image `flex-basis` when `picture_position` is `"left"` or `"right"`.                                               |
 | `image_aspect_ratio`          | `str`                              | `"native"`     | Image aspect ratio. Options: `"native"`, or CSS aspect-ratio strings (e.g., `"1/1"`, `"16/9"`).                                           |
 | `image_object_fit`            | `str`                              | `"cover"`      | CSS `object-fit` property for the image (e.g., `"cover"`, `"contain"`).                                                                      |
-| `mobile_breakpoint_behavior`  | `str`                              | `"stack top"`  | Behavior for horizontal cards on viewports ≤ 600px. Options: `"stack top"`, `"stack bottom"`, `"shrink"`, `"none"`.                        |
+| `mobile_breakpoint_behavior`  | `str`                              | `"none"`  | Behavior for horizontal cards on viewports ≤ 600px. Options: `"stack top"`, `"stack bottom"`, `"shrink"`, `"none"`.                        |
 | `on_button_click`             | `Optional[Callable[[], Any]]`      | `None`         | Python callback for click events. Triggered by button (if present) or card (if no button).                                                 |
 | `styles`                      | `Optional[Dict[str, Dict[str, Any]]]` | `None`         | Dictionary for custom CSS. Slots: `"card"`, `"title"`, `"text"`, `"price"`, `"button"`, `"image"`. Keys must be kebab-case (e.g., `font-family`). |
 | `key`                         | `Optional[str]`                    | `None`         | A unique key for the Streamlit component.                                                                                                 |
