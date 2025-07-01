@@ -11,7 +11,7 @@ setuptools.setup(
     description="An e-commerce product card component for Streamlit",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/msr2903/st-productcard",
+    url="https://github.com/msr2903/st-product-card",
     packages=setuptools.find_packages(where="."),
     include_package_data=True,
     classifiers=[
